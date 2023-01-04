@@ -1,0 +1,27 @@
+{
+  "name": "telegram-bot-activitystreams",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.cjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qertis/telegram-bot-activitystreams.git"
+  },
+  "keywords": [
+    "ActivityStreams",
+    "2.0",
+    "activitystreams"
+  ],
+  "author": "Denis Baskovsky (https://baskovsky.ru)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/qertis/telegram-bot-activitystreams/issues"
+  },
+  "homepage": "https://github.com/qertis/telegram-bot-activitystreams#readme",
+  "dependencies": {
+    "date-fns": "^2.29.3"
+  }
+}
