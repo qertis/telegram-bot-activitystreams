@@ -7,9 +7,17 @@ const person = (x) => ({
   id: String(x.id),
 });
 
+const contactPerson = (x) => ({
+  type: 'Person',
+  name: x.contact.first_name + ' ' + x.contact.last_name,
+  id: String(x.contact.user_id),
+  to: x.contact.phone_number ? `tel:+${x.contact.phone_number}` : null,
+});
+
 const note = (x) => ({
   type: 'Note',
   content: x.text,
+  mediaType: 'text/plain',
 });
 
 const audio = (x) => ({
@@ -69,6 +77,9 @@ module.exports = (message) => {
     objects.push(note(message));
   }
 
+  if (message.contact) {
+    objects.push(contactPerson(message));
+  }
   if (message.photo) {
     message.photo.forEach(photo => {
       objects.push({
