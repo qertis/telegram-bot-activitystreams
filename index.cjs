@@ -7,8 +7,8 @@ const person = (x) => ({
   id: String(x.id),
 });
 
-const contactPerson = (x) => ({
-  type: 'Person',
+const profile = (x) => ({
+  type: 'Profile',
   name: x.contact.first_name + ' ' + x.contact.last_name,
   id: String(x.contact.user_id),
   to: x.contact.phone_number ? `tel:+${x.contact.phone_number}` : null,
@@ -57,6 +57,11 @@ const document = (x) => ({
   },
 });
 
+const tag = (x) => ({
+  id: x,
+  name: '#' + x,
+});
+
 const event = (x) => ({
   type: 'Event',
   name: x.text,
@@ -68,17 +73,52 @@ const place = (x) => ({
   longitude: x.location.longitude,
 });
 
+const getHashtagsFromEntities = (entities, text) => {
+  return entities
+      .filter((entity) => entity.type === 'hashtag')
+      .map(entity => {
+        // eslint-disable-next-line unicorn/prefer-string-slice
+        const hashtag = text.substr(
+            entity.offset + 1,
+            entity.length - 1,
+        );
+        return hashtag;
+      });
+}
+
+function getHashtags(message) {
+  const hashtags = new Set();
+    // caption entities
+    if (Array.isArray(message.caption_entities)) {
+      getHashtagsFromEntities(message.caption_entities, message.caption).forEach((hashtag) => {
+        hashtags.add(hashtag);
+      });
+    }
+    // entities
+    if (Array.isArray(message.entities)) {
+      getHashtagsFromEntities(message.entities, message.text).forEach((hashtag) => {
+        hashtags.add(hashtag);
+      });
+    }
+    return [...hashtags];
+}
+
 module.exports = (message) => {
   const objects = [];
 
-  if (message.text && Array.isArray(message.entities) && message.entities.length > 0) {
-    objects.push(event(message));
-  } else if (message.text) {
-    objects.push(note(message));
+  if (message.text) {
+    const n = note(message)
+
+    if (Array.isArray(message.entities) && message.entities.length > 0) {
+      const hashtags = getHashtags(message);
+      n.tag = hashtags.map(h => tag(h));
+    }
+
+    objects.push(n);
   }
 
   if (message.contact) {
-    objects.push(contactPerson(message));
+    objects.push(profile(message));
   }
   if (message.photo) {
     message.photo.forEach(photo => {
