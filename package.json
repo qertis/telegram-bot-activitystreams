@@ -1,19 +1,20 @@
 {
   "name": "telegram-bot-activitystreams",
   "version": "1.0.0",
-  "description": "",
+  "description": "ActivityStreams 2.0 Telegram Bot API",
   "main": "index.cjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/index.test.cjs"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/qertis/telegram-bot-activitystreams.git"
   },
   "keywords": [
-    "ActivityStreams",
-    "2.0",
-    "activitystreams"
+    "ActivityStreams 2.0",
+    "telegram bot api activitystreams",
+    "telegram bot message activity streams",
+    "telegram bot api express activitystreams"
   ],
   "author": "Denis Baskovsky (https://baskovsky.ru)",
   "license": "MIT",
