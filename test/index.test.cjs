@@ -2,7 +2,15 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const activitystreams = require('../index.cjs');
 
-test('ActivityStreams', async (t) => {
+test('Public Message', async (t) => {
+    await t.test('channel-message', () => {
+        const commandMessage = require('./fixture/channel-message.cjs');
+        const activity = activitystreams(commandMessage);
+        assert.equal(activity.actor.type, 'Group');
+    });
+});
+
+test('Bot Message', async (t) => {
     await t.test('event', () => {
         const commandMessage = require('./fixture/command.cjs');
         const activity = activitystreams(commandMessage);

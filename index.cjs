@@ -7,6 +7,12 @@ const person = (x) => ({
   id: String(x.id),
 });
 
+const group = (x) => ({
+  type: 'Group',
+  name: x.username,
+  id: String(x.id),
+});
+
 const profile = (x) => ({
   type: 'Profile',
   name: x.contact.first_name + ' ' + x.contact.last_name,
@@ -160,6 +166,26 @@ function objects(message) {
 }
 
 module.exports = (message) => {
+  if (message.channel_post) {
+    return {
+      '@context': 'https://www.w3.org/ns/activitystreams',
+      type: 'Activity',
+      instrument: {
+        type: 'Service',
+        name: 'telegram channel',
+      },
+      object: objects(message.channel_post),
+      actor: group(message.channel_post.chat),
+      origin: {
+        type: 'Object',
+        name: 'Telegram Bot Message',
+        id: String(message.channel_post.message_id),
+      },
+      startTime: dateFns.fromUnixTime(message.channel_post.date).toISOString(),
+      endTime: dateFns.fromUnixTime(Math.round(new Date().getTime() / 1000)).toISOString(),
+    }
+  }
+
   return {
     '@context': 'https://www.w3.org/ns/activitystreams',
     type: 'Activity',
