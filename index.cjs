@@ -1,10 +1,21 @@
 // file object params used, but not required - see https://github.com/qertis/telegram-bot-express
-const dateFns = require('date-fns');
+const fromUnixTime = require('date-fns/fromUnixTime');
 
 const person = (x) => ({
   type: 'Person',
   name: x.first_name + ' ' + x.last_name,
   id: String(x.id),
+});
+
+const origin = (x) => ({
+  type: 'Object',
+  name: 'Telegram Bot Message',
+  id: String(x?.channel_post?.message_id ?? x.message_id),
+});
+
+const instrument = (x) => ({
+  type: 'Service',
+  name: x.channel_post ? 'telegram channel' : 'telegram',
 });
 
 const group = (x) => ({
@@ -170,19 +181,12 @@ module.exports = (message) => {
     return {
       '@context': 'https://www.w3.org/ns/activitystreams',
       type: 'Activity',
-      instrument: {
-        type: 'Service',
-        name: 'telegram channel',
-      },
+      instrument: instrument(message),
       object: objects(message.channel_post),
       actor: group(message.channel_post.chat),
-      origin: {
-        type: 'Object',
-        name: 'Telegram Bot Message',
-        id: String(message.channel_post.message_id),
-      },
-      startTime: dateFns.fromUnixTime(message.channel_post.date).toISOString(),
-      endTime: dateFns.fromUnixTime(Math.round(new Date().getTime() / 1000)).toISOString(),
+      origin: origin(message),
+      startTime: fromUnixTime(message.channel_post.date).toISOString(),
+      endTime: fromUnixTime(Math.round(new Date().getTime() / 1000)).toISOString(),
     }
   }
 
@@ -190,19 +194,12 @@ module.exports = (message) => {
     '@context': 'https://www.w3.org/ns/activitystreams',
     type: 'Activity',
     summary: message.type,
-    instrument: {
-      type: 'Service',
-      name: 'telegram',
-    },
+    instrument: instrument(message),
     actor: person(message.from),
     object: objects(message),
     target: person(message.chat),
-    origin: {
-      type: 'Object',
-      name: 'Telegram Bot Message',
-      id: String(message.message_id),
-    },
-    startTime: dateFns.fromUnixTime(message.date).toISOString(),
-    endTime: dateFns.fromUnixTime(Math.round(new Date().getTime() / 1000)).toISOString(),
+    origin: origin(message),
+    startTime: fromUnixTime(message.date).toISOString(),
+    endTime: fromUnixTime(Math.round(new Date().getTime() / 1000)).toISOString(),
   }
 }
