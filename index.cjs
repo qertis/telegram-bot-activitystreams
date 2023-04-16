@@ -176,7 +176,12 @@ function objects(message) {
   return objects;
 }
 
+function time(date) {
+  return fromUnixTime(date).toISOString()
+}
+
 module.exports = (message) => {
+  const now = Math.round(new Date().getTime() / 1000)
   if (message.channel_post) {
     return {
       '@context': 'https://www.w3.org/ns/activitystreams',
@@ -185,8 +190,8 @@ module.exports = (message) => {
       object: objects(message.channel_post),
       actor: group(message.channel_post.chat),
       origin: origin(message),
-      startTime: fromUnixTime(message.channel_post.date).toISOString(),
-      endTime: fromUnixTime(Math.round(new Date().getTime() / 1000)).toISOString(),
+      startTime: time(message.channel_post.date),
+      endTime: time(now),
     }
   }
 
@@ -199,7 +204,7 @@ module.exports = (message) => {
     object: objects(message),
     target: person(message.chat),
     origin: origin(message),
-    startTime: fromUnixTime(message.date).toISOString(),
-    endTime: fromUnixTime(Math.round(new Date().getTime() / 1000)).toISOString(),
+    startTime: time(message.date),
+    endTime: time(now),
   }
 }
