@@ -4,7 +4,6 @@ module.exports = {
     id: 1,
     is_bot: false,
     first_name: 'First',
-    last_name: 'Second',
     language_code: 'en'
   },
   chat: {

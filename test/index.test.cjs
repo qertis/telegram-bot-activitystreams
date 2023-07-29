@@ -8,6 +8,11 @@ test('Public Message', async (t) => {
         const activity = activitystreams(commandMessage);
         assert.equal(activity.actor.type, 'Group');
     });
+    await t.test('channel', () => {
+        const commandMessage = require('./fixture/channel.cjs');
+        const activity = activitystreams(commandMessage);
+        assert.equal(activity.actor.type, 'Group');
+    });
 });
 
 test('Bot Message', async (t) => {

@@ -3,7 +3,7 @@ const fromUnixTime = require('date-fns/fromUnixTime');
 
 const person = (x) => ({
   type: 'Person',
-  name: x.first_name + ' ' + x.last_name,
+  name: (x.first_name + ' ' + (x.last_name ?? '')).trimEnd(),
   id: String(x.id),
 });
 
@@ -191,6 +191,17 @@ module.exports = (message) => {
       actor: group(message.channel_post.chat),
       origin: origin(message),
       startTime: time(message.channel_post.date),
+      endTime: time(now),
+    }
+  } else if (message.sender_chat) {
+    return {
+      '@context': 'https://www.w3.org/ns/activitystreams',
+      type: 'Activity',
+      instrument: instrument(message),
+      object: objects(message),
+      actor: group(message.sender_chat),
+      origin: origin(message),
+      startTime: time(message.date),
       endTime: time(now),
     }
   }
