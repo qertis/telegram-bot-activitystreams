@@ -1,7 +1,7 @@
 {
   "name": "telegram-bot-activitystreams",
-  "version": "1.0.1",
-  "description": "ActivityStreams 2.0 Telegram Bot API",
+  "version": "1.0.2",
+  "description": "Telegram Bot Messages ActivityStreams 2.0",
   "main": "index.cjs",
   "scripts": {
     "test": "node test/index.test.cjs"
@@ -13,8 +13,8 @@
   "keywords": [
     "ActivityStreams 2.0",
     "telegram bot api activitystreams",
-    "telegram bot message activity streams",
-    "telegram bot api express activitystreams"
+    "telegram message activity streams",
+    "telegram bot api express activitystreams 2.0"
   ],
   "author": "Denis Baskovsky (https://baskovsky.ru)",
   "license": "MIT",

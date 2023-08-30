@@ -1,4 +1,4 @@
-# Telegram Bot API ActivityStreams 2.0
+# Telegram Bot Messages to ActivityStreams 2.0
 
 ## ActivityStreams 2.0 
 

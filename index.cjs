@@ -1,9 +1,13 @@
 // file object params used, but not required - see https://github.com/qertis/telegram-bot-express
 const fromUnixTime = require('date-fns/fromUnixTime');
 
+const getFullName = (x) => {
+  return (x.first_name + ' ' + (x.last_name ?? '')).trimEnd()
+}
+
 const person = (x) => ({
   type: 'Person',
-  name: (x.first_name + ' ' + (x.last_name ?? '')).trimEnd(),
+  name: getFullName(x),
   id: String(x.id),
 });
 
@@ -26,7 +30,7 @@ const group = (x) => ({
 
 const profile = (x) => ({
   type: 'Profile',
-  name: x.contact.first_name + ' ' + x.contact.last_name,
+  name: getFullName(x.contact),
   id: String(x.contact.user_id),
   to: x.contact.phone_number ? `tel:+${x.contact.phone_number}` : null,
 });
@@ -182,9 +186,10 @@ function time(date) {
 
 module.exports = (message) => {
   const now = Math.round(new Date().getTime() / 1000)
+  const context = 'https://www.w3.org/ns/activitystreams'
   if (message.channel_post) {
     return {
-      '@context': 'https://www.w3.org/ns/activitystreams',
+      '@context': context,
       type: 'Activity',
       instrument: instrument(message),
       object: objects(message.channel_post),
@@ -195,7 +200,7 @@ module.exports = (message) => {
     }
   } else if (message.sender_chat) {
     return {
-      '@context': 'https://www.w3.org/ns/activitystreams',
+      '@context': context,
       type: 'Activity',
       instrument: instrument(message),
       object: objects(message),
@@ -207,7 +212,7 @@ module.exports = (message) => {
   }
 
   return {
-    '@context': 'https://www.w3.org/ns/activitystreams',
+    '@context': context,
     type: 'Activity',
     summary: message.type,
     instrument: instrument(message),
