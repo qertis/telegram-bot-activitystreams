@@ -1,5 +1,7 @@
 # Telegram Bot Messages to ActivityStreams 2.0
 
+Serialization telegram message into ActivityStreams.
+
 ## ActivityStreams 2.0 
 
 - [Terms](https://www.w3.org/ns/activitystreams)
@@ -28,8 +30,8 @@
 | Event    | ✅           |
 | Place    | ✅           |
 
-## Example 
-> Example use [node-telegram-bot-api](https://github.com/yagop/node-telegram-bot-api)
+## Example
+> [node-telegram-bot-api](https://github.com/yagop/node-telegram-bot-api)
 
 ```javascript
 const activitystreams = require('telegram-bot-activitystreams');
@@ -43,3 +45,5 @@ bot.on('message', (msg) => {
   bot.sendMessage(msg.chat.id, 'Hello ' + activity.actor.name);
 });
 ```
+
+Works better with [telegram-bot-api-express](https://github.com/qertis/telegram-bot-api-express).
