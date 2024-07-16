@@ -16,6 +16,19 @@ test('Public Message', async (t) => {
 });
 
 test('Bot Message', async (t) => {
+    await t.test('forward_message', () => {
+        const commandMessage = require('./fixture/forward-message.cjs');
+        const activity = activitystreams(commandMessage);
+        assert.equal(activity.origin.type, 'Person');
+        assert.equal(activity.origin.name, 'UName');
+    });
+
+    await t.test('sticker', () => {
+        const commandMessage = require('./fixture/sticker.cjs');
+        const activity = activitystreams(commandMessage);
+        assert.equal(activity.object[0].content, '👋');
+    });
+
     await t.test('event', () => {
         const commandMessage = require('./fixture/command.cjs');
         const activity = activitystreams(commandMessage);

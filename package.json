@@ -1,6 +1,6 @@
 {
   "name": "telegram-bot-activitystreams",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Telegram Bot Messages ActivityStreams 2.0",
   "main": "index.cjs",
   "scripts": {
@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/qertis/telegram-bot-activitystreams#readme",
   "dependencies": {
-    "date-fns": "^2.30.0"
+    "date-fns": "^3.6.0"
   }
 }

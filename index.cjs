@@ -1,5 +1,5 @@
 // file object params used, but not required - see https://github.com/qertis/telegram-bot-express
-const fromUnixTime = require('date-fns/fromUnixTime');
+const {fromUnixTime} = require('date-fns/fromUnixTime');
 
 const getFullName = (x) => {
   return (x.first_name + ' ' + (x.last_name ?? '')).trimEnd()
@@ -11,15 +11,32 @@ const person = (x) => ({
   id: String(x.id),
 });
 
-const origin = (x) => ({
-  type: 'Object',
-  name: 'Telegram Bot Message',
-  id: String(x?.channel_post?.message_id ?? x.message_id),
-});
+const origin = (x) => {
+  if (x.forward_origin?.type === 'user') {
+    return person(x.forward_from ?? x.forward_origin.sender_user);
+  } else if (x.forward_origin?.type === 'hidden_user') {
+    return {
+      type: 'Person',
+      name: x.forward_sender_name,
+    }
+  }
+  return {
+    type: 'Application',
+    name: x.forward_from?.is_bot ? x.forward_from.username : 'Telegram',
+    id: String(x?.channel_post?.message_id ?? x.message_id),
+  }
+};
 
 const instrument = (x) => ({
   type: 'Service',
   name: x.channel_post ? 'telegram channel' : 'telegram',
+});
+
+const sticker = ({sticker}) => ({
+  type: 'Object',
+  id: 'https://t.me/stickers' + '#' + sticker.set_name,
+  name: sticker.set_name,
+  content: sticker.emoji,
 });
 
 const group = (x) => ({
@@ -176,17 +193,20 @@ function objects(message) {
   if (message.location) {
     objects.push(place(message));
   }
+  if (message.sticker) {
+    objects.push(sticker(message));
+  }
 
   return objects;
 }
 
 function time(date) {
-  return fromUnixTime(date).toISOString()
+  return fromUnixTime(date).toISOString();
 }
 
 module.exports = (message) => {
-  const now = Math.round(new Date().getTime() / 1000)
-  const context = 'https://www.w3.org/ns/activitystreams'
+  const now = Math.round(new Date().getTime() / 1000);
+  const context = 'https://www.w3.org/ns/activitystreams';
   if (message.channel_post) {
     return {
       '@context': context,
@@ -210,7 +230,6 @@ module.exports = (message) => {
       endTime: time(now),
     }
   }
-
   return {
     '@context': context,
     type: 'Activity',
