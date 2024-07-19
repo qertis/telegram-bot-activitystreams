@@ -1,4 +1,4 @@
-# Telegram Bot Messages to ActivityStreams 2.0
+# ActivityStreams 2.0 Telegram Bot Messages
 
 Serialization telegram message into ActivityStreams.
 
@@ -32,6 +32,10 @@ Serialization telegram message into ActivityStreams.
 
 ## Example
 > [node-telegram-bot-api](https://github.com/yagop/node-telegram-bot-api)
+
+```bash
+npm i telegram-bot-activitystreams
+```
 
 ```javascript
 const activitystreams = require('telegram-bot-activitystreams');
