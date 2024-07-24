@@ -96,4 +96,13 @@ test('Bot Message', async (t) => {
         assert.equal(object.type, 'Audio');
         assert.equal(object.mediaType, 'audio/ogg');
     });
+
+    await t.test('audio', () => {
+        const voice = require('./fixture/audio.cjs');
+        const activity = activitystreams(voice);
+        const [object] = activity.object;
+
+        assert.equal(object.type, 'Audio');
+        assert.equal(object.mediaType, 'audio/x-m4a');
+    });
 });

@@ -2,8 +2,6 @@
 
 Serialization telegram message into ActivityStreams.
 
-## ActivityStreams 2.0 
-
 - [Terms](https://www.w3.org/ns/activitystreams)
 - [Specification](https://www.w3.org/TR/activitystreams-core)
 - [Vocabulary](https://www.w3.org/TR/activitystreams-vocabulary)

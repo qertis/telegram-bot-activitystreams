@@ -58,11 +58,20 @@ const note = (x) => ({
   mediaType: 'text/plain',
 });
 
-const audio = (x) => ({
+const voice = (x) => ({
   type: 'Audio',
   url: x.voice?.file?.url,
   duration: x.voice.duration,
   mediaType: x.voice.mime_type,
+})
+
+const audio = (x) => ({
+  type: 'Audio',
+  url: x.voice?.file?.url,
+  duration: x.audio.duration,
+  mediaType: x.audio.mime_type,
+  summary: x.caption,
+  name: x.audio.file_name,
 });
 
 const video = (x) => ({
@@ -188,13 +197,16 @@ function objects(message) {
     objects.push(document(message));
   }
   if (message.voice) {
-    objects.push(audio(message));
+    objects.push(voice(message));
   }
   if (message.location) {
     objects.push(place(message));
   }
   if (message.sticker) {
     objects.push(sticker(message));
+  }
+  if (message.audio) {
+    objects.push(audio(message));
   }
 
   return objects;
