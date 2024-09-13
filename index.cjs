@@ -74,6 +74,20 @@ const audio = (x) => ({
   name: x.audio.file_name,
 });
 
+const thumbnail = (x) => {
+  const thumb = x.thumb || x.thumbnail;
+  if (thumb) {
+    return {
+      type: 'Image',
+      id: x.file_unique_id,
+      url: thumb?.file?.url,
+      width: thumb.width,
+      height: thumb.height,
+    }
+  }
+  return null
+}
+
 const video = (x) => ({
   type: 'Video',
   summary: x.caption,
@@ -82,12 +96,14 @@ const video = (x) => ({
   width: x.video.width,
   height: x.video.height,
   mediaType: x.video.mime_type,
-  icon: x.video.thumb ? {
-    type: 'Image',
-    url: x.video.thumb?.file?.url,
-    width: x.video.thumb.width,
-    height: x.video.thumb.height,
-  } : null,
+  icon: thumbnail(x.video),
+});
+
+const videoNote = (x) => ({
+  type: 'Video',
+  url: x.video_note?.file?.url,
+  duration: x.video_note.duration,
+  icon: thumbnail(x.video_note),
 });
 
 const document = (x) => ({
@@ -96,12 +112,7 @@ const document = (x) => ({
   url: x.document?.file?.url,
   mediaType: x.document.mime_type,
   name: x.document.file_name,
-  icon: x.document.thumb ? {
-    type: 'Image',
-    url: x.document.thumb?.file?.url,
-    width: x.document.thumb.width,
-    height: x.document.thumb.height,
-  } : null,
+  icon: thumbnail(x.document),
 });
 
 const tag = (x) => ({
@@ -175,20 +186,25 @@ function objects(message) {
   }
   if (message.photo) {
     const captionHashtags = getHashtagsFromCaption(message);
-
-    message.photo.forEach(photo => {
+    const photoHQ = message.photo.map(photo => {
       const image = {
         type: 'Image',
         width: photo.width,
         height: photo.height,
         url: photo?.file?.url,
-        summary: message.caption,
+        summary: message?.caption,
       };
       if (captionHashtags.length > 0) {
         image.tag = captionHashtags.map(h => tag(h));
       }
-      objects.push(image);
-    });
+      return image;
+    }).reduce((acc, photo) => {
+      if (acc.width < photo.width) {
+        acc = photo;
+      }
+      return acc;
+    }, { width: 0 });
+    objects.push(photoHQ);
   }
   if (message.video) {
     objects.push(video(message));
@@ -207,6 +223,9 @@ function objects(message) {
   }
   if (message.audio) {
     objects.push(audio(message));
+  }
+  if (message.video_note) {
+    objects.push(videoNote(message));
   }
 
   return objects;
