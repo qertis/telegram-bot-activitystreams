@@ -1,8 +1,24 @@
 // file object params used, but not required - see https://github.com/qertis/telegram-bot-express
 const {fromUnixTime} = require('date-fns/fromUnixTime');
 
+const isTextLikeMarkdown = (text) => {
+  // Consecutive lines beginning with 1.
+  if (/(^|[\n\r])\s*1\.\s.*\s+1\.\s/gm.test(text)) {
+    return true;
+  }
+  // Link markdown
+  if (/!?\[([^\]]*)\]\(([^\)]+)\)/gm.test(text)) {
+    return true;
+  }
+  // Double underscores or asterisks when a left-right pair
+  if (/\s(__|\*\*)(?!\s)(.(?!\1))+(?!\s(?=\1))/gm.test(text)) {
+    return true;
+  }
+  return false;
+}
+
 const getFullName = (x) => {
-  return (x.first_name + ' ' + (x.last_name ?? '')).trimEnd()
+  return (x.first_name + ' ' + (x.last_name ?? '')).trimEnd();
 }
 
 const person = (x) => ({
@@ -55,7 +71,7 @@ const profile = (x) => ({
 const note = (x) => ({
   type: 'Note',
   content: x.text,
-  mediaType: 'text/plain',
+  mediaType: isTextLikeMarkdown(x.text) ? 'text/markdown' : 'text/plain',
 });
 
 const voice = (x) => ({
@@ -168,9 +184,18 @@ function objects(message) {
   const objects = [];
 
   if (message.text) {
+    if (Array.isArray(message.entities)) {
+      let dub = message.text;
+      message.entities.filter(entity => entity.type === 'text_link').reverse().forEach(entity => {
+        const text = message.text.substring(entity.offset, entity.offset + entity.length);
+        dub = dub.replace(text, `[${text}](${entity.url})`);
+      });
+      message.text = dub;
+    }
+
     const textHashtags = getHashtagsFromText(message);
     let n;
-    if (Array.isArray(message.entities) &&  message.entities.some(e => e.type === 'bot_command')) {
+    if (Array.isArray(message.entities) && message.entities.some(e => e.type === 'bot_command')) {
       n = event(message);
     } else {
       n = note(message);
