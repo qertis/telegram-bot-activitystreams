@@ -83,7 +83,7 @@ const voice = (x) => ({
 
 const audio = (x) => ({
   type: 'Audio',
-  url: x.voice?.file?.url,
+  url: x.audio?.file?.url,
   duration: x.audio.duration,
   mediaType: x.audio.mime_type,
   summary: x.caption,
