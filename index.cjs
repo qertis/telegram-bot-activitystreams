@@ -18,34 +18,74 @@ const isTextLikeMarkdown = (text) => {
 }
 
 const getFullName = (x) => {
-  return (x.first_name + ' ' + (x.last_name ?? '')).trimEnd();
+  if (x.first_name) {
+    return (x.first_name + ' ' + (x.last_name ?? '')).trimEnd();
+  }
+  return x.username;
 }
 
-const person = (x) => ({
-  type: 'Person',
-  name: getFullName(x),
-  id: String(x.id),
-});
+const actor = (x) => {
+  let type, name, id
 
-const origin = (x) => {
-  if (x.forward_origin?.type === 'user') {
-    return person(x.forward_from ?? x.forward_origin.sender_user);
-  } else if (x.forward_origin?.type === 'hidden_user') {
-    return {
-      type: 'Person',
-      name: x.forward_sender_name,
+  if (x.channel_post) {
+    type = 'Group'
+    name = getFullName(x.channel_post.chat)
+    id = x.channel_post?.message_id
+  } else if (x.type === 'channel') {
+    type = 'Group'
+    name = getFullName(x)
+    id = x.id
+  } else if (x.sender_chat) {
+    type = 'Group'
+    name = getFullName(x.sender_chat) || x.sender_chat.username
+    id = String(x.sender_chat);
+  } else if (x.from) {
+    type = x.is_bot ? 'Service' : 'Person'
+    name = getFullName(x.from)
+    if (x.from.id) {
+      id = String(x.from.id)
+    }
+  } else {
+    type = x.is_bot ? 'Service' : 'Person'
+    name = getFullName(x)
+    if (x.id) {
+      id = String(x.id)
     }
   }
+
   return {
-    type: 'Application',
-    name: x.forward_from?.is_bot ? x.forward_from.username : 'Telegram',
-    id: String(x?.channel_post?.message_id ?? x.message_id),
+    type,
+    name,
+    id,
   }
 };
 
-const instrument = (x) => ({
-  type: 'Service',
-  name: x.channel_post ? 'telegram channel' : 'telegram',
+const origin = (x) => {
+  switch (x.forward_origin?.type) {
+    case 'user': {
+      const user = x.forward_from ?? x.forward_origin.sender_user
+      return {
+        type: 'Person',
+        name: getFullName(user),
+        id: String(user.id),
+      }
+    }
+    case 'hidden_user': {
+      console.log(x)
+      return {
+        type: 'Person',
+        name: x.forward_sender_name,
+      }
+    }
+    default: {
+      return actor(x)
+    }
+  }
+};
+
+const instrument = () => ({
+  type: 'Application',
+  name: 'Telegram',
 });
 
 const sticker = ({sticker}) => ({
@@ -53,12 +93,6 @@ const sticker = ({sticker}) => ({
   id: 'https://t.me/stickers' + '#' + sticker.set_name,
   name: sticker.set_name,
   content: sticker.emoji,
-});
-
-const group = (x) => ({
-  type: 'Group',
-  name: x.username,
-  id: String(x.id),
 });
 
 const profile = (x) => ({
@@ -256,46 +290,43 @@ function objects(message) {
   return objects;
 }
 
-function time(date) {
+function time(date = Math.round(new Date().getTime() / 1000)) {
   return fromUnixTime(date).toISOString();
 }
 
 module.exports = (message) => {
-  const now = Math.round(new Date().getTime() / 1000);
   const context = 'https://www.w3.org/ns/activitystreams';
+
   if (message.channel_post) {
     return {
       '@context': context,
       type: 'Activity',
-      instrument: instrument(message),
+      instrument: instrument(),
       object: objects(message.channel_post),
-      actor: group(message.channel_post.chat),
+      actor: actor(message.channel_post.chat),
       origin: origin(message),
       startTime: time(message.channel_post.date),
-      endTime: time(now),
     }
   } else if (message.sender_chat) {
     return {
       '@context': context,
       type: 'Activity',
-      instrument: instrument(message),
+      instrument: instrument(),
       object: objects(message),
-      actor: group(message.sender_chat),
+      actor: actor(message.sender_chat),
       origin: origin(message),
       startTime: time(message.date),
-      endTime: time(now),
     }
   }
   return {
     '@context': context,
     type: 'Activity',
     summary: message.type,
-    instrument: instrument(message),
-    actor: person(message.from),
+    instrument: instrument(),
+    actor: actor(message.from),
     object: objects(message),
-    target: person(message.chat),
+    target: actor(message.chat),
     origin: origin(message),
     startTime: time(message.date),
-    endTime: time(now),
   }
 }

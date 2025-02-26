@@ -62,7 +62,7 @@ test('Bot Message', async (t) => {
         const activity = activitystreams(message);
         const [object] = activity.object;
 
-        assert.equal(activity.origin.id, '4')
+        assert.equal(activity.origin.id, '1')
         assert.equal(object.type, 'Note');
         assert.equal(object.content, 'hello world');
     });
