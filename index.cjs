@@ -183,15 +183,15 @@ const place = (x) => ({
 
 const getHashtagsFromEntities = (entities, text) => {
   return entities
-      .filter((entity) => entity.type === 'hashtag')
-      .map(entity => {
-        // eslint-disable-next-line unicorn/prefer-string-slice
-        const hashtag = text.substr(
-            entity.offset + 1,
-            entity.length - 1,
-        );
-        return hashtag;
-      });
+    .filter((entity) => entity.type === 'hashtag')
+    .map(entity => {
+      // eslint-disable-next-line unicorn/prefer-string-slice
+      const hashtag = text.substr(
+        entity.offset + 1,
+        entity.length - 1,
+      );
+      return hashtag;
+    });
 }
 
 function getHashtagsFromText(message) {
@@ -262,7 +262,7 @@ function objects(message) {
         acc = photo;
       }
       return acc;
-    }, { width: 0 });
+    }, {width: 0});
     objects.push(photoHQ);
   }
   if (message.video) {
