@@ -71,7 +71,6 @@ const origin = (x) => {
       }
     }
     case 'hidden_user': {
-      console.log(x)
       return {
         type: 'Person',
         name: x.forward_sender_name,
@@ -179,6 +178,17 @@ const place = (x) => ({
   type: 'Place',
   latitude: x.location.latitude,
   longitude: x.location.longitude,
+});
+
+const inlineQuery = (x) => ({
+  type: 'Question',
+  content: x.query,
+  mediaType: isTextLikeMarkdown(x.query) ? 'text/markdown' : 'text/plain',
+});
+
+const inlineQueryTarget = (x) => ({
+  type: x.chat_type === 'sender' ? 'Person' : 'Group',
+  name: x.chat_type,
 });
 
 const getHashtagsFromEntities = (entities, text) => {
@@ -315,6 +325,18 @@ module.exports = (message) => {
       object: objects(message),
       actor: actor(message.sender_chat),
       origin: origin(message),
+      startTime: time(message.date),
+    }
+  } else if (message.from && typeof message.query === 'string' && typeof message.offset === 'string') {
+    return {
+      '@context': context,
+      type: 'Activity',
+      summary: 'inline_query',
+      instrument: instrument(),
+      actor: actor(message.from),
+      object: [inlineQuery(message)],
+      target: inlineQueryTarget(message),
+      origin: actor(message.from),
       startTime: time(message.date),
     }
   }

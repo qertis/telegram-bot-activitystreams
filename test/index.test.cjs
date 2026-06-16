@@ -94,4 +94,24 @@ test('Bot Message', async (t) => {
     assert.equal(object.type, 'Audio');
     assert.equal(object.mediaType, 'audio/x-m4a');
   });
+  await t.test('inline_query', () => {
+    const inlineQuery = require('./fixture/inline-query.cjs');
+    const activity = activitystreams(inlineQuery);
+    const [object] = activity.object;
+    assert.equal(activity.summary, 'inline_query');
+    assert.equal(activity.actor.type, 'Person');
+    assert.equal(activity.actor.name, 'First');
+    assert.equal(activity.target.type, 'Group');
+    assert.equal(object.type, 'Question');
+    assert.equal(object.content, '');
+  });
+  await t.test('inline_query_supergroup', () => {
+    const inlineQuery = {
+      ...require('./fixture/inline-query.cjs'),
+      chat_type: 'supergroup',
+    };
+    const activity = activitystreams(inlineQuery);
+    assert.equal(activity.target.type, 'Group');
+    assert.equal(activity.target.name, 'supergroup');
+  });
 });
