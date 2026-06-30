@@ -1,17 +1,14 @@
-// file object params used, but not required - see https://github.com/qertis/telegram-bot-express
-const {fromUnixTime} = require('date-fns/fromUnixTime');
-
 const isTextLikeMarkdown = (text) => {
   // Consecutive lines beginning with 1.
   if (/(^|[\n\r])\s*1\.\s.*\s+1\.\s/gm.test(text)) {
     return true;
   }
   // Link markdown
-  if (/!?\[([^\]]*)\]\(([^\)]+)\)/gm.test(text)) {
+  else if (/!?\[([^\]]*)\]\(([^\)]+)\)/gm.test(text)) {
     return true;
   }
   // Double underscores or asterisks when a left-right pair
-  if (/\s(__|\*\*)(?!\s)(.(?!\1))+(?!\s(?=\1))/gm.test(text)) {
+  else if (/\s(__|\*\*)(?!\s)(.(?!\1))+(?!\s(?=\1))/gm.test(text)) {
     return true;
   }
   return false;
@@ -300,11 +297,11 @@ function objects(message) {
   return objects;
 }
 
-function time(date = Math.round(new Date().getTime() / 1000)) {
-  return fromUnixTime(date).toISOString();
+function time(date) {
+  return new Date(date === undefined ? Date.now() : date * 1000).toISOString();
 }
 
-module.exports = (message) => {
+export default function activitystreams(message) {
   const context = 'https://www.w3.org/ns/activitystreams';
 
   if (message.channel_post) {
